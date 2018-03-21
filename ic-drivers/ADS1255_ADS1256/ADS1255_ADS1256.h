@@ -71,8 +71,8 @@
 
 // ********* Define external ADC IC inputs ********* 
 #define spi_clkin 1800000                           // mbed SPI Frequency 1.8 Mhz
-#define f_clkin_ADC_nominal 7680000                 // 7.68 MHz The intended default frequency source for the ADS1255 chip
-#define f_clkin_ADC_applied 8000000                 // 8.00 MHz The acutally used frequency source for the ADS1255 chip
+#define f_clkin_ADC_nominal 7680000                 // 7.68 MHz The default frequency source for the ADS1255 chip
+#define f_clkin_ADC_applied 8000000                 // 8.00 MHz The actually used frequency source for the ADS1255 chip
 
 #define MasterClockPeriod 1/f_clkin_ADC_applied     // Time period for one clock cylce
 #define f_clkin_ADC_function_scaling_factor f_clkin_ADC_applied/f_clkin_ADC_nominal     // Factor for scaling all chip functions wich are linear tied to f_clin frequency source
