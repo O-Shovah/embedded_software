@@ -1,0 +1,14 @@
+[Version]
+Version=10.3
+[Designs]
+Blink_leads_Reset=Blink_leads_Reset.adf
+[Settings]
+Active=Blink_leads_Reset
+[Expand]
+blink_leads_reset=1
+[Browser]
+sort=order
+mode=none
+[Order]
+order=1
+macro=

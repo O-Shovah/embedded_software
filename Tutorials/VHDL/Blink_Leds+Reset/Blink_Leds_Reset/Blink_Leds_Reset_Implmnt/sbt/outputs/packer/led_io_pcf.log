@@ -1,0 +1,6 @@
+OUTPUT led_2 	 location (13, 4, 1) 	 53 	 SB_LVCMOS
+OUTPUT led_0 	 location (13, 7, 1) 	 59 	 SB_LVCMOS
+INPUT  rst_in 	 location (6, 0, 1) 	 33 	 SB_LVCMOS
+INPUT  refclk 	 location (0, 9, 0) 	 13 	 SB_LVCMOS
+OUTPUT led_3 	 location (13, 6, 1) 	 56 	 SB_LVCMOS
+OUTPUT led_1 	 location (13, 3, 1) 	 51 	 SB_LVCMOS

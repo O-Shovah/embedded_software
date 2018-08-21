@@ -1,0 +1,10 @@
+@N: MF248 |Running in 64-bit mode.
+@N: MF666 |Clock conversion enabled. (Command "set_option -fix_gated_and_generated_clocks 1" in the project file.)
+@N: MT206 |Auto Constrain mode is enabled
+@N: FX1016 :"c:\projekte\software\eigene_software\embedded_software\tutorials\vhdl\blink_one_led.vhd":7:5:7:10|SB_GB_IO inserted on the port refclk.
+@N: FX1017 :|SB_GB inserted on the net led_3_c_i.
+@N: BW103 |The default time unit for the Synopsys Constraint File (SDC or FDC) is 1ns.
+@N: BW107 |Synopsys Constraint File capacitance units using default value of 1pF 
+@N: FX1056 |Writing EDF file: C:\Projekte\Software\Eigene_Software\embedded_software\Tutorials\VHDL\Blink_Leds+Reset\Blink_Leds_Reset\Blink_Leds_Reset_Implmnt\Blink_Leds_Reset.edf
+@N: MT320 |This timing report is an estimate of place and route data. For final timing results, use the FPGA vendor place and route report.
+@N: MT322 |Clock constraints include only register-to-register paths associated with each individual clock.

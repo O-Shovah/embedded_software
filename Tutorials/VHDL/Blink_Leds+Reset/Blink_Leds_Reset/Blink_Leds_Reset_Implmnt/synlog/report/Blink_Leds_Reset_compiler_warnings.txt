@@ -1,0 +1,4 @@
+@W: CG234 :"C:\Projekte\Software\Eigene_Software\embedded_software\Tutorials\VHDL\blink_one_LED.vhd":56:4:56:8|Duplicate definition of reset
+@W: CD434 :"C:\Projekte\Software\Eigene_Software\embedded_software\Tutorials\VHDL\blink_one_LED.vhd":73:24:73:29|Signal refclk in the sensitivity list is not used in the process. Make sure all variables in the sensitivity list are referenced in the process.
+@W: CL169 :"C:\Projekte\Software\Eigene_Software\embedded_software\Tutorials\VHDL\blink_one_LED.vhd":60:5:60:6|Pruning unused register Rst_3. Make sure that there are no unused intermediate registers.
+

@@ -1,0 +1,4 @@
+@N: CD630 :"C:\Projekte\Software\Eigene_Software\embedded_software\Tutorials\VHDL\blink_one_LED.vhd":5:8:5:10|Synthesizing work.led.rtl.
+@W: CD434 :"C:\Projekte\Software\Eigene_Software\embedded_software\Tutorials\VHDL\blink_one_LED.vhd":73:24:73:29|Signal refclk in the sensitivity list is not used in the process. Make sure all variables in the sensitivity list are referenced in the process.
+Post processing for work.led.rtl
+@W: CL169 :"C:\Projekte\Software\Eigene_Software\embedded_software\Tutorials\VHDL\blink_one_LED.vhd":60:5:60:6|Pruning unused register Rst_3. Make sure that there are no unused intermediate registers.

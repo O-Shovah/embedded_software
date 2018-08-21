@@ -1,0 +1,4 @@
+@E: CD541 :"C:\Projekte\Software\Eigene_Software\embedded_software\Tutorials\VHDL\blink_one_LED.vhd":13:8:13:12|Expecting ;
+@E: CG103 :"C:\Projekte\Software\Eigene_Software\embedded_software\Tutorials\VHDL\blink_one_LED.vhd":14:4:14:4|Expecting expression
+@E: Parse errors encountered - exiting
+

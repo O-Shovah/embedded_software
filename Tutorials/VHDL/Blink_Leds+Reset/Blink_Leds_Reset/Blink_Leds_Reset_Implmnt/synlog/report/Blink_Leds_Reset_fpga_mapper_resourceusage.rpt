@@ -1,0 +1,25 @@
+---------------------------------------
+Resource Usage Report for led 
+
+Mapping to part: ice40hx1kvq100
+Cell usage:
+SB_CARRY        20 uses
+SB_DFFR         22 uses
+SB_DFFS         2 uses
+SB_GB           1 use
+SB_LUT4         54 uses
+
+I/O ports: 6
+I/O primitives: 6
+SB_GB_IO       1 use
+SB_IO          5 uses
+
+I/O Register bits:                  0
+Register bits not including I/Os:   24 (1%)
+
+@S |Mapping Summary:
+Total  LUTs: 54 (4%)
+
+Distribution of All Consumed LUTs = LUT4 
+Distribution of All Consumed Luts 54 = 54 
+

@@ -1,0 +1,46 @@
+Running in Lattice mode
+
+
+Starting:    C:\lscc\iCEcube2.2017.08\synpbase\bin64\mbin\synbatch.exe
+Install:     C:\lscc\iCEcube2.2017.08\synpbase
+Hostname:    DESKTOP-CU3O88I
+Date:        Sun Jun 24 00:14:40 2018
+Version:     L-2016.09L+ice40
+
+Arguments:   -product synplify_pro -batch Blink_Leds_Reset_syn.prj
+ProductType: synplify_pro
+
+
+
+
+
+log file: "C:\Projekte\Software\Eigene_Software\embedded_software\Tutorials\VHDL\Blink_Leds+Reset\Blink_Leds_Reset\Blink_Leds_Reset_Implmnt\Blink_Leds_Reset.srr"
+Running: Blink_Leds_Reset_Implmnt in foreground
+
+Running Blink_Leds_Reset_syn|Blink_Leds_Reset_Implmnt
+
+Running: compile (Compile) on Blink_Leds_Reset_syn|Blink_Leds_Reset_Implmnt
+# Sun Jun 24 00:14:40 2018
+
+Running: compile_flow (Compile Process) on Blink_Leds_Reset_syn|Blink_Leds_Reset_Implmnt
+# Sun Jun 24 00:14:40 2018
+
+Running: compiler (Compile Input) on Blink_Leds_Reset_syn|Blink_Leds_Reset_Implmnt
+# Sun Jun 24 00:14:40 2018
+compiler exited with errors
+Job failed on: Blink_Leds_Reset_syn|Blink_Leds_Reset_Implmnt
+
+Job: "compiler" terminated with error status: 2
+See log file: "C:\Projekte\Software\Eigene_Software\embedded_software\Tutorials\VHDL\Blink_Leds+Reset\Blink_Leds_Reset\Blink_Leds_Reset_Implmnt\synlog\Blink_Leds_Reset_compiler.srr"
+# Sun Jun 24 00:14:40 2018
+
+Return Code: 2
+Run Time:00h:00m:00s
+Complete: Compile Process on Blink_Leds_Reset_syn|Blink_Leds_Reset_Implmnt
+Complete: Compile on Blink_Leds_Reset_syn|Blink_Leds_Reset_Implmnt
+Complete: Logic Synthesis on Blink_Leds_Reset_syn|Blink_Leds_Reset_Implmnt
+
+exit status=2
+
+exit status=2
+
