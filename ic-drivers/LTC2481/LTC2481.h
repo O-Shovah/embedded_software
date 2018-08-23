@@ -4,70 +4,45 @@
 /**
  * Includes
  */
-//#include "mbed.h"
+
 #include "find_number.h"
 
 /**
  * Defines
  */
 
-// ********* LTC2481 Registers ********************
-#define ADS_STATUS   0x00    // LTC2481 Status register 
-#define ADS_MUX      0x01    // LTC2481 Multiplexer register 
-#define ADS_ADCON    0x02    // LTC2481 ADCON register 
-#define ADS_DRATE    0x03    // LTC2481 Data rate register 
-#define ADS_IO       0x04    // LTC2481 IO register 
-#define ADS_OFC0     0x05    // LTC2481 Offset register 
-#define ADS_OFC1     0x06    // LTC2481 Offset register 
-#define ADS_OFC2     0x07    // LTC2481 Offset register 
-#define ADS_FSC0     0x08    // LTC2481 Scale register 
-#define ADS_FSC1     0x09    // LTC2481 Scale register 
-#define ADS_FSC2     0x0A    // LTC2481 Scale register 
-
 // ********* LTC2481 Commands ********************
-#define ADS_WAKEUP   0x00    // LTC2481 command 
-#define ADS_RDATA    0x01    // LTC2481 command 
-#define ADS_RDATAC   0x03    // LTC2481 command 
-#define ADS_SDATAC   0x0f    // LTC2481 command 
-#define ADS_RREG     0x10    // LTC2481 command 
-#define ADS_WREG     0x50    // LTC2481 command 
-#define ADS_SELFCAL  0xf0    // LTC2481 command 
-#define ADS_SELFOCAL 0xf1    // LTC2481 command 
-#define ADS_SELFGCAL 0xf2    // LTC2481 command 
-#define ADS_SYSOCAL  0xf3    // LTC2481 command 
-#define ADS_SYSGCAL  0xf4    // LTC2481 command 
-#define ADS_SYNC     0xfc    // LTC2481 command 
-#define ADS_STANDBY  0xfd    // LTC2481 command 
-#define ADS_RESET    0xfe    // LTC2481 command 
-#define ADS_WAKEUP2  0xff    // LTC2481 command
+//These are OR together to make the 8 bit config word.
+// OR bitwise with address for read or write
+#define READ      0x01
+#define WRITE     0x00
 
-// ********* LTC2481 DataRate ********************
-#define ADS_30k_SPS  0b11110000 // 30,000SPS (default)
-#define ADS_15k_SPS  0b11100000 // 15,000SPS
-#define ADS_7500_SPS 0b11010000 // 7,500SPS
-#define ADS_3750_SPS 0b11000000 // 3,750SPS
-#define ADS_2000_SPS 0b10110000 // 2,000SPS
-#define ADS_1000_SPS 0b10100001 // 1,000SPS
-#define ADS_500_SPS  0b10010010 // 500SPS
-#define ADS_100_SPS  0b10000010 // 100SPS
-#define ADS_60_SPS   0b01110010 // 60SPS
-#define ADS_50_SPS   0b01100011 // 50SPS
-#define ADS_30_SPS   0b01010011 // 30SPS
-#define ADS_25_SPS   0b01000011 // 25SPS
-#define ADS_15_SPS   0b00110011 // 15SPS
-#define ADS_10_SPS   0b00100011 // 10SPS
-#define ADS_5_SPS    0b00010011 // 5SPS
-#define ADS_2_5_SPS  0b00000011 // 2.5SPS
 
 // ********* LTC2481 Amplifaction Gains *********
-#define ADS_1_PGA  0b000 // PGA 1 (default)
-#define ADS_2_PGA  0b001 // PGA 2
-#define ADS_4_PGA  0b010 // PGA 4
-#define ADS_8_PGA  0b011 // PGA 8
-#define ADS_16_PGA 0b100 // PGA 16
-#define ADS_32_PGA 0b101 // PGA 32
-#define ADS_64_PGA 0b110 // PGA 64
-//#define ADS_64_SPS 0b111 // PGA 64
+#define GAIN1  0b00000000   // G = 1   (SPD = 0), G = 1   (SPD = 1)
+#define GAIN2  0b00100000   // G = 4   (SPD = 0), G = 2   (SPD = 1)
+#define GAIN3  0b01000000   // G = 8   (SPD = 0), G = 4   (SPD = 1)
+#define GAIN4  0b01100000   // G = 16  (SPD = 0), G = 8   (SPD = 1)
+#define GAIN5  0b10000000   // G = 32  (SPD = 0), G = 16  (SPD = 1)
+#define GAIN6  0b10100000   // G = 64  (SPD = 0), G = 32  (SPD = 1)
+#define GAIN7  0b11000000   // G = 128 (SPD = 0), G = 64  (SPD = 1)
+#define GAIN8  0b11100000   // G = 256 (SPD = 0), G = 128 (SPD = 1)
+
+// Select ADC source - differential input or PTAT circuit
+
+#define VIN    0b00000000
+#define PTAT   0b00001000
+
+// Select rejection frequency - 50, 55, or 60Hz
+#define R50    0b00000010
+#define R55    0b00000000
+#define R60    0b00000100
+
+// ********* LTC2481 DataRate and Calibration********************
+// Speed setting is bit 7 in the 2nd byte
+#define Low_Speed_7_5_SPS   0b00000000 // Low output rate with autozero
+#define High_Speed_15_SPS   0b00000001 // High output rate without autozero
+
 
 // ********* Define external ADC IC inputs ********* 
 #define spi_clkin 1800000                           // mbed SPI Frequency 1.8 Mhz
