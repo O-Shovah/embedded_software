@@ -12,11 +12,25 @@
  */
 
 // ********* LTC2481 Commands ********************
-// These are OR together to make the 8 bit config word.
 // OR bitwise with address for read or write
 #define READ      0x01
 #define WRITE     0x00
 
+// ********* LTC2481 Addresses ********************
+//  TC2481 configurable Address Assignment 
+//    CA1         CA0/f0      Address 
+//    LOW         HIGH        001 01 00
+//    LOW         Floating    001 01 01
+//    Floating    Floating    010 01 00
+//    HIGH        HIGH        010 01 10
+//    HIGH        Floating    010 01 11
+//
+//    Global Address          111 01 11
+
+
+
+// ********* LTC2481 Configuration *********
+//These settings are OR together to assemble the 8 bit config byte.
 
 // ********* LTC2481 Amplifaction Gains *********
 // avaidable Gains depend on Speed setting
@@ -41,20 +55,20 @@
 #define Reject_60Hz    0b00000100
 
 // ********* LTC2481 DataRate and Calibration********************
-// Speed setting is bit 7 in the 2nd byte
+// Speed setting is set by bit 7 in the configuration byte
 #define Low_Speed_7_5_SPS   0b00000000 // Low output rate with autozero
 #define High_Speed_15_SPS   0b00000001 // High output rate without autozero
 
 
 // ********* Define external ADC IC inputs ********* 
-#define spi_clkin 1800000                           // mbed SPI Frequency 1.8 Mhz
-#define f_clkin_ADC_nominal 7680000                 // 7.68 MHz The intended default frequency source for the LTC2481 chip
-#define f_clkin_ADC_applied 8000000                 // 8.00 MHz The acutally used frequency source for the LTC2481 chip
+#define I2C_clkin 100000                            // 100 khz (0 to 400khz) I2C Bus Frequency
+#define f_clkin_ADC_internal 125000                 // 125 kHz The internal default frequency source for the LTC2481 chip
+#define f_clkin_ADC_external_applied 800000         // 800 khz (10 to 1000 kHz) The external frequency source for the LTC2481 chip if applied
 
 #define MasterClockPeriod 1/f_clkin_ADC_applied     // Time period for one clock cylce
 #define f_clkin_ADC_function_scaling_factor f_clkin_ADC_applied/f_clkin_ADC_nominal     // Factor for scaling all chip functions wich are linear tied to f_clin frequency source
 
-#define ADC_ReferenceVoltage 1024                   // The voltage of the reference source in mV
+#define ADC_ReferenceVoltage 4096                   // The voltage of the reference source in mV
 
 class LTC2481
 {
@@ -82,15 +96,15 @@ public:
     int32_t ADS_read_data();
     //uint8_t A+D_Control(uint8_t gain_setting, uint8_t sensor_detect, uint8_t clock-out_setting);
 
-    int32_t samplerate_set;
+    int32_t samplerate_set; // returns the samplerate currently configured in the ADC
 
 
     void ADC_Select(bool selected);
     void ADC_hard_reset();
     void ADC_reset_values();
 
-    uint8_t ADC_Amplification_Gain_select(uint8_t ADC_Gain_requested)
-    uint32_t ADC_Meassurement_Range(uint32_t adc_input_range_requested)
+    uint8_t ADC_Amplification_Gain_select(uint8_t ADC_Gain_requested) // user requests a specific Gain setting
+    uint32_t ADC_Meassurement_Range(uint32_t adc_input_range_requested) //user requests an input range in mV
 
 private:
 

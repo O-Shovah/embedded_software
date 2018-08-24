@@ -1,6 +1,7 @@
 /**
  * Includes
  */
+
 #include "LTC2481.h"
 
 LTC2481::LTC2481(PinName _mosi, PinName _miso, PinName _sclk, PinName _datardy, PinName _csadc) : spi_(_mosi, _miso, _sclk), Datardy_(_datardy), Chip_Select_(_csadc)
@@ -171,11 +172,11 @@ int32_t LTC2481::ADC_Data_Rate_select(int32_t samplerate_requested)
 //Select the appropriate Gain setting for maximising  ADC resolution for a voltage in mV given by the user.
 uint32_t LTC2481::ADC_Meassurement_Range(uint32_t adc_input_range_requested)
 {
-    range_gain_requested = (2*ADC_ReferenceVoltage) / adc_input_range_requested  // Range of LTC2481 is +/- 2*Vref
+    range_gain_requested = (0.5*ADC_ReferenceVoltage) / adc_input_range_requested  // Range of LTC2481 is +/- 0.5*Vref
 
     range_gain_set = ADC_Amplification_Gain_select(range_gain_requested);
 
-    input_range_set = (2 * ADC_ReferenceVoltage) / range_gain_set ;
+    input_range_set = (0.5 * ADC_ReferenceVoltage) / range_gain_set ;
 
     return input_range_set;
 }
