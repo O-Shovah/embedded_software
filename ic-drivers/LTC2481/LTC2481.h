@@ -12,31 +12,33 @@
  */
 
 // ********* LTC2481 Commands ********************
-//These are OR together to make the 8 bit config word.
+// These are OR together to make the 8 bit config word.
 // OR bitwise with address for read or write
 #define READ      0x01
 #define WRITE     0x00
 
 
 // ********* LTC2481 Amplifaction Gains *********
-#define GAIN1  0b00000000   // G = 1   (SPD = 0), G = 1   (SPD = 1)
-#define GAIN2  0b00100000   // G = 4   (SPD = 0), G = 2   (SPD = 1)
-#define GAIN3  0b01000000   // G = 8   (SPD = 0), G = 4   (SPD = 1)
-#define GAIN4  0b01100000   // G = 16  (SPD = 0), G = 8   (SPD = 1)
-#define GAIN5  0b10000000   // G = 32  (SPD = 0), G = 16  (SPD = 1)
-#define GAIN6  0b10100000   // G = 64  (SPD = 0), G = 32  (SPD = 1)
-#define GAIN7  0b11000000   // G = 128 (SPD = 0), G = 64  (SPD = 1)
-#define GAIN8  0b11100000   // G = 256 (SPD = 0), G = 128 (SPD = 1)
+// avaidable Gains depend on Speed setting
+#define GAIN_1_1        0b00000000   // G = 1   (SPD = 0), G = 1   (SPD = 1)
+#define GAIN_4_2        0b00100000   // G = 4   (SPD = 0), G = 2   (SPD = 1)
+#define GAIN_8_4        0b01000000   // G = 8   (SPD = 0), G = 4   (SPD = 1)
+#define GAIN_16_8       0b01100000   // G = 16  (SPD = 0), G = 8   (SPD = 1)
+#define GAIN_32_16      0b10000000   // G = 32  (SPD = 0), G = 16  (SPD = 1)
+#define GAIN_64_32      0b10100000   // G = 64  (SPD = 0), G = 32  (SPD = 1)
+#define GAIN_128_64     0b11000000   // G = 128 (SPD = 0), G = 64  (SPD = 1)
+#define GAIN_256_128    0b11100000   // G = 256 (SPD = 0), G = 128 (SPD = 1)
 
-// Select ADC source - differential input or PTAT circuit
+// ********* LTC2481 ADC source *********
+// differential input or PTAT (Temperature) circuit
 
 #define VIN    0b00000000
 #define PTAT   0b00001000
 
-// Select rejection frequency - 50, 55, or 60Hz
-#define R50    0b00000010
-#define R55    0b00000000
-#define R60    0b00000100
+// ********* LTC2481 Rejection frequency *********//
+#define Reject_50Hz    0b00000010
+#define Reject_55Hz    0b00000000
+#define Reject_60Hz    0b00000100
 
 // ********* LTC2481 DataRate and Calibration********************
 // Speed setting is bit 7 in the 2nd byte
