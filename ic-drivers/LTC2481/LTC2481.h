@@ -20,10 +20,10 @@
 //  TC2481 configurable Address Assignment 
 //    CA1         CA0/f0      Address 
 //    LOW         HIGH        001 01 00
-//    LOW         Floating    001 01 01
-//    Floating    Floating    010 01 00
+//    LOW         FLOATING    001 01 01
+//    FLOATING    FLOATING    010 01 00
 //    HIGH        HIGH        010 01 10
-//    HIGH        Floating    010 01 11
+//    HIGH        FLOATING    010 01 11
 //
 //    Global Address          111 01 11
 
@@ -65,7 +65,7 @@
 #define f_clkin_ADC_internal 125000                 // 125 kHz The internal default frequency source for the LTC2481 chip
 #define f_clkin_ADC_external_applied 800000         // 800 khz (10 to 1000 kHz) The external frequency source for the LTC2481 chip if applied
 
-#define MasterClockPeriod 1/f_clkin_ADC_applied     // Time period for one clock cylce
+#define MasterClockPeriod 1/f_clkin_ADC_internal     // Time period for one clock cylce
 #define f_clkin_ADC_function_scaling_factor f_clkin_ADC_applied/f_clkin_ADC_nominal     // Factor for scaling all chip functions wich are linear tied to f_clin frequency source
 
 #define ADC_ReferenceVoltage 4096                   // The voltage of the reference source in mV
@@ -78,38 +78,59 @@ public:
     /**
      * Constructor.
      */
-    LTC2481(PinName _mosi, PinName _miso, PinName _sclk, PinName _datardy, PinName _csadc);
+
+    LTC2481(PinName _sda, PinName _scl, char _CA0, char _CA1); //Object creation with handed I2C Bus pins and state of the two address configuration Pins
 
 
-    LTC2481();
+    LTC2481(PinName _sda, PinName _scl); //Object creation with handed I2C Bus pins and default address
 
-     
+    
+    // ***** Bus Settings *****
+
+    uint8_t  Set_Bus_Frequency(uint32_t I2C_frequency )
+
+    // ***** ADC Settings *****
+
+    uint8_t Request_samplerate(int32_t samplerate_requested);
+
+    uint8_t Request_Amplification_Gain(uint8_t adc_gain_requested); // user requests a specific Gain setting
+    
+    uint8_t Request_Meassurement_Range(uint32_t adc_input_range_requested); // user requests an input range in mV
+
+    uint8_t Set_ADC_Address(char _CA0, char _CA1); // user sets the ADC Address by handing state of the address configuration pins
+
+
+    uint32_t Read_samplerate_set(); // returns the samplerate currently configured in the ADC
+
+    uint8_t Read_Amplification_Gain();
+
+    uint32_t Read_Meassurement_Range();
+
+    uint8_t Read_ADC_Address();
+
+    // ***** ADC Control *****
+
+    void Command_Select(bool selected); 
+    void Command_hard_reset();
+    void Command_reset_settings();
+
+    void Command_start_continuous_mode();
+    void Command_stop_continuous_mode();
+
+
+    // uint8_t Command_gain(uint8_t gain_setting);    
+
+    int32_t Read_read_data();
     
 
-    int32_t ADC_Data_Rate_select(int32_t samplerate_requested);
+
     
 
-    void stop_continuous_mode();
-    void start_continuous_mode();
-
-    uint8_t ADC_Control(uint8_t gain_setting);    
-    int32_t ADS_read_data();
-    //uint8_t A+D_Control(uint8_t gain_setting, uint8_t sensor_detect, uint8_t clock-out_setting);
-
-    int32_t samplerate_set; // returns the samplerate currently configured in the ADC
-
-
-    void ADC_Select(bool selected);
-    void ADC_hard_reset();
-    void ADC_reset_values();
-
-    uint8_t ADC_Amplification_Gain_select(uint8_t ADC_Gain_requested) // user requests a specific Gain setting
-    uint32_t ADC_Meassurement_Range(uint32_t adc_input_range_requested) //user requests an input range in mV
-
+    
 private:
 
     //Declare IO Pins
-    SPI spi_;
+    I2C i2c_;
     InterruptIn Datardy_;
     DigitalOut Chip_Select_;
 
