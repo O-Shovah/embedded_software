@@ -299,7 +299,7 @@ uint8_t LTC2481::ADC_Control(uint8_t gain_setting, uint8_t sensor_detect, uint8_
 }
 
 //set up the AS1255 to return data on every Data Read
-void LTC2481::start_continuous_mode()
+void LTC2481::Command_start_continuous_mode()
 {
     uint8_t i=0;
     while((ADC_reseted == true) && (i<700)) {
@@ -318,7 +318,7 @@ void LTC2481::start_continuous_mode()
 }
 
 //Stop the LTC2481 from returning on every Data Read  
-void LTC2481::stop_continuous_mode()
+void LTC2481::Command_stop_continuous_mode()
 {
     uint8_t i=0;
     while((ADC_reseted == true) && (i<700)) {
@@ -333,6 +333,12 @@ void LTC2481::stop_continuous_mode()
         ADC_reseted == true;
 
     }
+}
+
+//set up the LTC2481 returning just data from a single conversion  
+void LTC2481::Command_single_conversion()
+{
+
 }
 
 

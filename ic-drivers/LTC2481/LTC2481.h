@@ -116,14 +116,15 @@ public:
 
     void Command_start_continuous_mode();
     void Command_stop_continuous_mode();
+    void Command_single_conversion();
 
     void Command_synchronise_all_ADC();
 
 
     int32_t Read_read_ADC();
+    int32_t Read_single_read_ADC();
 
 
-    // uint8_t Command_gain(uint8_t gain_setting);    
 
     
     
