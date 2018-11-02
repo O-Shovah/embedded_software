@@ -87,26 +87,26 @@ public:
     
     // ***** Bus Settings *****
 
-    uint8_t  Set_Bus_Frequency(uint32_t I2C_frequency )
+    uint8_t  Set_Bus_Frequency(uint32_t I2C_frequency) // Set the operation frequency for the I2C Bus communiaction
 
     // ***** ADC Settings *****
 
-    uint8_t Request_samplerate(int32_t samplerate_requested);
+    uint32_t Request_samplerate(uint32_t samplerate_requested); // user requests a samplerate for the ADC. Returns the samplerate that was actually set.
 
-    uint8_t Request_Amplification_Gain(uint8_t adc_gain_requested); // user requests a specific Gain setting
+    uint8_t Request_Amplification_Gain(uint8_t adc_gain_requested); // user requests a specific Gain setting. Returns the Gain that was actually set.
     
-    uint8_t Request_Meassurement_Range(uint32_t adc_input_range_requested); // user requests an input range in mV
+    uint32_t Request_Meassurement_Range(uint32_t adc_input_range_requested); // user requests an input range in mV. Returns the Meassurement Range that was actually set.
 
-    uint8_t Set_ADC_Address(char _CA0, char _CA1); // user sets the ADC Address by handing state of the address configuration pins
+    uint8_t Set_ADC_Address(char _CA0, char _CA1); // user sets the ADC Address by handing state of the address configuration pins. Returns success.
 
 
     uint32_t Read_samplerate_set(); // returns the samplerate currently configured in the ADC
 
-    uint8_t Read_Amplification_Gain();
+    uint8_t Read_Amplification_Gain(); // returns the Gain currently configured in the ADC
 
-    uint32_t Read_Meassurement_Range();
+    uint32_t Read_Meassurement_Range(); // returns the Meassurement Range currently configured in the ADC
 
-    uint8_t Read_ADC_Address();
+    uint8_t Read_ADC_Address(); // returns the I2C Address currently configured in the ADC
 
     // ***** ADC Control *****
 
