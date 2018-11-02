@@ -108,7 +108,7 @@ int32_t LTC2481::ADC_Samplerate_select(int32_t samplerate_requested)
             samplerate_set = 0b00000001; //5SPS
 
         default :
-            samplerate_set = 0; // Error Message
+            samplerate_set = 0b00000000; // Error Message
 
     }
 
@@ -156,7 +156,7 @@ uint8_t LTC2481::ADC_Amplification_Gain_select(uint8_t ADC_Gain_requested)
 
     gain_commanded = ADC_Find_Gain.find_smaller(Gain_requested);
 
-    if (speed_set == 0b00000001)
+    if (samplerate_set == 0b00000001)
     {
     gain_commanded = gain_commanded << 1
     }
@@ -182,10 +182,10 @@ uint8_t LTC2481::ADC_Amplification_Gain_select(uint8_t ADC_Gain_requested)
             gain_set = 0b10100000; // PGA 64
 
         case 128 :
-            gain_set = 0b11000000;  // PGA 128
+            gain_set = 0b11000000; // PGA 128
 
         case 256 :
-            gain_set = 0b11100000;  // PGA 256
+            gain_set = 0b11100000; // PGA 256
 
         default :
             gain_set = 0b00000000; // PGA 1 (default)

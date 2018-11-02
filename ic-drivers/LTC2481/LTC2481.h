@@ -154,7 +154,7 @@ private:
 
     //Initialize Gain selection
     bool ADC_Amplification_Gain_init();
-    int32_t ADC_Amplification_Gains_avaidable[7];
+    int32_t ADC_Amplification_Gains_avaidable[8];
     int32_t ADC_Number_of_Gains_avaidable;
     find_number ADC_Find_Gain;
 
