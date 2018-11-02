@@ -1,14 +1,16 @@
 /**
- * Includes
+ *  Includes
  */
 
 #include "LTC2481.h"
 
-LTC2481::LTC2481(PinName _mosi, PinName _miso, PinName _sclk, PinName _datardy, PinName _csadc) : spi_(_mosi, _miso, _sclk), Datardy_(_datardy), Chip_Select_(_csadc)
+
+/*
+*   Class initialisation
+*/
+
+LTC2481::LTC2481(PinName _sda, PinName _scl, char _CA0, char _CA1) : I2C_(_sda, _scl), Addressconfig_ (_CA0, _CA1)
 {
-	//set up Interrupt pins for the Dataready line
-    Datardy_.fall(this, &LTC2481::Dataready_set);
-    Datardy_.rise(this, &LTC2481::Dataready_unset);
 
     //Initialize ADC state variable
     ADC_reseted = false;
@@ -37,6 +39,10 @@ LTC2481::LTC2481(PinName _mosi, PinName _miso, PinName _sclk, PinName _datardy, 
     ADC_reset_values();
     //wait(100 * (float)MasterClockPeriod);
 }
+
+/*
+*   Class Functions
+*/
 
 //select the LTC2481 chip on the SPI
 void LTC2481::ADC_Select(bool selected)
@@ -77,85 +83,29 @@ void LTC2481::ADC_reset_values()
     ADC_data_already_read = true;
 }
 
-//Load the avaidable Datarates into an arry to be searchd later
-bool LTC2481::ADC_Data_Rate_init()
+//Load the avaidable Samplerates into an array to be searched later
+bool LTC2481::ADC_Samplerate_init()
 {
-	ADC_Datarates_avaidable[0] = 2;
-    ADC_Datarates_avaidable[1] = 5;
-    ADC_Datarates_avaidable[2] = 10;
-    ADC_Datarates_avaidable[3] = 15;
-    ADC_Datarates_avaidable[4] = 25;
-    ADC_Datarates_avaidable[5] = 30;
-    ADC_Datarates_avaidable[6] = 50;
-    ADC_Datarates_avaidable[7] = 60;
-    ADC_Datarates_avaidable[8] = 100;
-    ADC_Datarates_avaidable[9] = 500;
-    ADC_Datarates_avaidable[10] = 1000;
-    ADC_Datarates_avaidable[11] = 2000;
-    ADC_Datarates_avaidable[12] = 3750;
-    ADC_Datarates_avaidable[13] = 7500;
-    ADC_Datarates_avaidable[14] = 15000;
-    ADC_Datarates_avaidable[15] = 30000;
+	ADC_Samplerates_avaidable[0] = 7;
+    ADC_Samplerates_avaidable[1] = 15;
 
-    ADC_Number_of_Datarates_avaidable = (sizeof(ADC_Datarates_avaidable)/sizeof(*ADC_Datarates_avaidable));
+    ADC_Number_of_Samplerates_avaidable = (sizeof(ADC_Samplerates_avaidable)/sizeof(*ADC_Samplerates_avaidable));
 
     return 0;
 }
 
-int32_t LTC2481::ADC_Data_Rate_select(int32_t samplerate_requested)
+int32_t LTC2481::ADC_Samplerate_select(int32_t samplerate_requested)
 {
 
-    samplerate_commanded = ADC_Find_Data_Rate.find_closest(samplerate_requested);
+    samplerate_commanded = ADC_Find_Samplerate.find_closest(samplerate_requested);
 
     switch(samplerate_commanded) {
 
-        case 2 :
-            samplerate_set = 0b00000011; //2.5SPS
+        case 7 :
+            samplerate_set = 0b00000000; //2.5SPS
 
         case 5 :
-            samplerate_set = 0b00010011; //5SPS
-
-        case 10 :
-            samplerate_set = 0b00100011; //10SPS
-
-        case 15 :
-            samplerate_set = 0b00110011; //15SPS
-
-        case 25 :
-            samplerate_set = 0b01000011; //25SPS
-
-        case 30 :
-            samplerate_set = 0b01010011; //30SPS
-
-        case 50 :
-            samplerate_set = 0b01100011; //50SPS
-
-        case 60 :
-            samplerate_set = 0b01110010; //60SPS
-
-        case 100 :
-            samplerate_set = 0b10000010; //100SPS
-
-        case 500 :
-            samplerate_set = 0b10010010; //500SPS
-
-        case 1000 :
-            samplerate_set = 0b10100001; //1000SPS
-
-        case 2000 :
-            samplerate_set = 0b10110000; //2000SPS
-
-        case 3750 :
-            samplerate_set = 0b11000000; //3750SPS
-
-        case 7500 :
-            samplerate_set = 0b11010000; //7500SPS
-
-        case 15000 :
-            samplerate_set = 0b11100000; //15000SPS
-
-        case 30000 :
-            samplerate_set = 0b11110000; //30000SPS
+            samplerate_set = 0b00000001; //5SPS
 
         default :
             samplerate_set = 0; // Error Message
@@ -166,7 +116,7 @@ int32_t LTC2481::ADC_Data_Rate_select(int32_t samplerate_requested)
 
     ADC_reseted = true;
 
-    return samplerate_commanded;
+    return samplerate_set;
 }
 
 //Select the appropriate Gain setting for maximising  ADC resolution for a voltage in mV given by the user.
@@ -181,16 +131,17 @@ uint32_t LTC2481::ADC_Meassurement_Range(uint32_t adc_input_range_requested)
     return input_range_set;
 }
 
-//Load the avaidable Gains into an arry to be searchd later
+//Load the avaidable Gains into an arry to be searched later
 bool LTC2481::ADC_Amplification_Gain_init()
 {
 	ADC_Amplification_Gains_avaidable[0] = 1
-	ADC_Amplification_Gains_avaidable[1] = 2
-	ADC_Amplification_Gains_avaidable[2] = 4
-	ADC_Amplification_Gains_avaidable[3] = 8
-	ADC_Amplification_Gains_avaidable[4] = 16
-	ADC_Amplification_Gains_avaidable[5] = 32
-	ADC_Amplification_Gains_avaidable[6] = 64
+	ADC_Amplification_Gains_avaidable[1] = 4
+	ADC_Amplification_Gains_avaidable[2] = 8
+	ADC_Amplification_Gains_avaidable[3] = 16
+	ADC_Amplification_Gains_avaidable[4] = 32
+	ADC_Amplification_Gains_avaidable[5] = 64
+	ADC_Amplification_Gains_avaidable[6] = 128
+    ADC_Amplification_Gains_avaidable[7] = 256
 
 	ADC_Number_of_Gains_avaidable = (sizeof(ADC_Amplification_Gains_avaidable)/sizeof(*ADC_Amplification_Gains_avaidable));
 
@@ -202,39 +153,46 @@ bool LTC2481::ADC_Amplification_Gain_init()
 //set the Gain setting byte in the ADS
 uint8_t LTC2481::ADC_Amplification_Gain_select(uint8_t ADC_Gain_requested)
 {
-gain_commanded = ADC_Find_Gain.find_smaller(Gain_requested);
 
-switch(gain_commanded) {
+    gain_commanded = ADC_Find_Gain.find_smaller(Gain_requested);
+
+    if (speed_set == 0b00000001)
+    {
+    gain_commanded = gain_commanded << 1
+    }
+
+    switch(gain_commanded) {
 
         case 1 :
-            gain_set = 0b000; // PGA 1 (default)
-
-        case 2 :
-            gain_set = 0b001; // PGA 2
+            gain_set = 0b00000000; // PGA 1 (default)
 
         case 4 :
-            gain_set = 0b010; // PGA 4
+            gain_set = 0b00100000; // PGA 4
 
         case 8 :
-            gain_set = 0b011; // PGA 8
+            gain_set = 0b01000000; // PGA 8
 
         case 16 :
-            gain_set = 0b100; // PGA 16
+            gain_set = 0b01100000; // PGA 16
 
         case 32 :
-            gain_set = 0b101; // PGA 32
+            gain_set = 0b10000000; // PGA 32
 
         case 64 :
-            gain_set = 0b110;  // PGA 64
+            gain_set = 0b10100000; // PGA 64
+
+        case 128 :
+            gain_set = 0b11000000;  // PGA 128
+
+        case 256 :
+            gain_set = 0b11100000;  // PGA 256
 
         default :
-        gain_set = 0b000; // PGA 1 (default)
-
-        //ADS_PGA_64 0b111 // PGA 64
+            gain_set = 0b00000000; // PGA 1 (default)
 
         ADC_Control(ADS_DRATE, gain_set);
 
-return gain_commanded
+return gain_set
 }
 
 //Wait for ADC not reset or timout. Then write a setting register

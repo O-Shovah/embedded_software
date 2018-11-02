@@ -2,19 +2,19 @@
 #define LTC2481_H
 
 /**
- * Includes
+ *  Includes
  */
 
 #include "find_number.h"
 
 /**
- * Defines
+ *  Defines
  */
 
 // ********* LTC2481 Commands ********************
 // OR bitwise with address for read or write
-#define READ      0x01
-#define WRITE     0x00
+#define READ      0b00000001
+#define WRITE     0b00000000
 
 // ********* LTC2481 Addresses ********************
 //  TC2481 configurable Address Assignment 
@@ -76,7 +76,7 @@ class LTC2481
 public:
 
     /**
-     * Constructor.
+     *  Constructor.
      */
 
     LTC2481(PinName _sda, PinName _scl, char _CA0, char _CA1); //Object creation with handed I2C Bus pins and state of the two address configuration Pins
@@ -146,11 +146,11 @@ private:
     bool volatile ADC_reseted;
     bool volatile ADC_data_already_read;
 
-    //Initialize Data Rate selection
-    bool ADC_Data_Rate_init();
-    int32_t ADC_Datarates_avaidable[16];
-    int32_t ADC_Number_of_Datarates_avaidable;
-    find_number ADC_Find_Data_Rate;
+    //Initialize Samplerate selection
+    bool ADC_Samplerate_init();
+    int32_t ADC_Samplerates_avaidable[2];
+    int32_t ADC_Number_of_Samplerates_avaidable;
+    find_number ADC_Find_Samplerate;
 
     //Initialize Gain selection
     bool ADC_Amplification_Gain_init();
