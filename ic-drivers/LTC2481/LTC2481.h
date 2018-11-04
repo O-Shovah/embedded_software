@@ -160,12 +160,12 @@ private:
 
 
     //Variables
-    int32_t samplerate_commanded;
+    uint8_t samplerate_set,gain_set,rejection_set_temperatureread_set;
     
     
 
     //Internal Functions
-    void set_settings(uint8_t ADS_register, uint8_t ADS_value);
+    void ADC_set_settings(uint8_t ADS_address);
 
     
 

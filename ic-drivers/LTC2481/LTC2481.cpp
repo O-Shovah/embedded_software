@@ -96,6 +96,7 @@ bool LTC2481::ADC_Samplerate_init()
 
 int32_t LTC2481::ADC_Samplerate_select(int32_t samplerate_requested)
 {
+    uint32_t samplerate_commanded = 0;
 
     samplerate_commanded = ADC_Find_Samplerate.find_closest(samplerate_requested);
 
@@ -104,7 +105,7 @@ int32_t LTC2481::ADC_Samplerate_select(int32_t samplerate_requested)
         case 7 :
             samplerate_set = 0b00000000; //2.5SPS
 
-        case 5 :
+        case 15 :
             samplerate_set = 0b00000001; //5SPS
 
         default :
@@ -112,7 +113,7 @@ int32_t LTC2481::ADC_Samplerate_select(int32_t samplerate_requested)
 
     }
 
-    set_settings(ADS_DRATE, samplerate_set);
+    ADC_set_settings(ADC_address);
 
     ADC_reseted = true;
 
@@ -150,9 +151,10 @@ bool LTC2481::ADC_Amplification_Gain_init()
 
 //set up the avaidable Gain settings in an Array
 //find the smaller gain fitting to stay on safe range side
-//set the Gain setting byte in the ADS
+//set the Gain setting byte in the ADC
 uint8_t LTC2481::ADC_Amplification_Gain_select(uint8_t ADC_Gain_requested)
 {
+    uint32_t gain_commanded = 0;
 
     gain_commanded = ADC_Find_Gain.find_smaller(Gain_requested);
 
@@ -164,28 +166,28 @@ uint8_t LTC2481::ADC_Amplification_Gain_select(uint8_t ADC_Gain_requested)
     switch(gain_commanded) {
 
         case 1 :
-            gain_set = 0b00000000; // PGA 1 (default)
+            gain_set = 0b00000000; // G = 1   (SPD = 0), G = 1   (SPD = 1)
 
         case 4 :
-            gain_set = 0b00100000; // PGA 4
+            gain_set = 0b00100000; // G = 4   (SPD = 0), G = 2   (SPD = 1)
 
         case 8 :
-            gain_set = 0b01000000; // PGA 8
+            gain_set = 0b01000000; // G = 8   (SPD = 0), G = 4   (SPD = 1)
 
         case 16 :
-            gain_set = 0b01100000; // PGA 16
+            gain_set = 0b01100000; // G = 16  (SPD = 0), G = 8   (SPD = 1)
 
         case 32 :
-            gain_set = 0b10000000; // PGA 32
+            gain_set = 0b10000000; // G = 32  (SPD = 0), G = 16  (SPD = 1)
 
         case 64 :
-            gain_set = 0b10100000; // PGA 64
+            gain_set = 0b10100000; // G = 64  (SPD = 0), G = 32  (SPD = 1)
 
         case 128 :
-            gain_set = 0b11000000; // PGA 128
+            gain_set = 0b11000000; // G = 128 (SPD = 0), G = 64  (SPD = 1)
 
         case 256 :
-            gain_set = 0b11100000; // PGA 256
+            gain_set = 0b11100000; // G = 256 (SPD = 0), G = 128 (SPD = 1)
 
         default :
             gain_set = 0b00000000; // PGA 1 (default)
@@ -195,27 +197,28 @@ uint8_t LTC2481::ADC_Amplification_Gain_select(uint8_t ADC_Gain_requested)
 return gain_set
 }
 
-//Wait for ADC not reset or timout. Then write a setting register
-void LTC2481::ADC_set_settings(uint8_t ADS_register, uint8_t ADS_value)
+//Assemble the settings byte from private variables. Then write the settings to the passed address.
+void LTC2481::ADC_set_settings(uint8_t ADC_address)
 {
-    uint8_t i=0;
-    while((ADC_reseted == true) && (i<700)) {
+    uint8_t result = 0;
+    uint8_t ADC_settings = 0;
 
-        wait_us(1);
-        i++;
+    ADC_settings = ( samplerate_set | gain_set | rejection_set | temperatureread_set)
+
+    I2C.start;
+    result = I2C.write(ADC_address | 0 );
+
+    if (result == 0)
+    {
+    result = I2C.write(ADC_settings);
     }
-    if(ADC_reseted == false) {
 
-        spi_.write(ADS_WREG | ADS_register);    // 0101 0011
-        spi_.write(0x00);                       // 0 Byte
-        spi_.write(ADS_value);                  // 1000 SPS
+    I2C.stop;
 
-        ADC_reseted == true;
-    }
 }
 
 //Wait for ADC not reset or timout.Then read back the setting of the specified byte
-void LTC2481::ADC_read_settings(uint8_t ADS_register)
+void LTC2481::ADC_read_settings(uint8_t ADC_address)
 {
     uint8_t i=0;
     while((ADC_reseted == true) && (i<700)) {
