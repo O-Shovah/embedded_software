@@ -12,17 +12,14 @@
 LTC2481::LTC2481(PinName _sda, PinName _scl, char _CA0, char _CA1) : I2C_(_sda, _scl), Addressconfig_ (_CA0, _CA1)
 {
 
-    //Initialize ADC state variable
-    ADC_reseted = false;
-    ADC_DRDY_interrupted = false;
-    ADC_data_already_read = false;
-    Chip_Select_ = true;
+    //Initialize ADC setting variable
+
 
     //Initialize the available values for the Rate selection
-    ADC_Data_Rate_init();
+    ADC_Samplerate_init();
 
     //Create Object to find the feasible Data Rate value
-    ADC_Find_Data_Rate = find_number (ADC_Datarates_avaidable,ADC_Number_of_Datarates_avaidable);
+    ADC_Find_Samplerate = find_number (ADC_Samplerates_avaidable,ADC_Number_of_Samplerates_avaidable);
 
     //Initialize the available values for the Gain selection
     ADC_Amplification_Gain_init();
@@ -44,74 +41,36 @@ LTC2481::LTC2481(PinName _sda, PinName _scl, char _CA0, char _CA1) : I2C_(_sda, 
 *   Class Functions
 */
 
-//select the LTC2481 chip on the SPI
-void LTC2481::ADC_Select(bool selected)
-{
-    Chip_Select_ = selected;
-}
-
-//Fallig Edge of the !DATARDY Pin indicates ADS ready for Data Read
-void LTC2481::Dataready_set()
-{
-    ADC_DRDY_interrupted = true;
-    ADC_reseted = false;
-    ADC_data_already_read = false;
-}
-
-//Rising Edge of the !DATARDY Pin indicates ADS not ready for Data Read
-void LTC2481::Dataready_unset()
-{
-    ADS_DRDY_interrupted = false;
-    ADC_data_already_read = true;
-}
-
-//Pulls down the !RESET pin on the ADS to trigger hardware reset
-void LTC2481::ADC_hard_reset()
-{
-    spi_.write(ADS_RESET); // TBD: to be routed to hardware pin
-    ADC_DRDY_interrupted = false;
-    ADC_reseted = true;
-    ADC_data_already_read = true;
-}
-
-//This command byte resets all ADS settings to default
-void LTC2481::ADC_reset_values()
-{
-    spi_.write(ADS_RESET);
-    ADC_DRDY_interrupted = false;
-    ADC_reseted = true;
-    ADC_data_already_read = true;
-}
-
-uint8_t LTC2481::Set_ADC_Address(char _CA0, char _CA1)
+uint8_t LTC2481::Set_ADC_address_set(char _CA0, char _CA1)
 {
     
     if (_CA1 == LOW && _CA0 == HIGH)
     {
-    ADC_address = 0010100
+    ADC_address_set = 0010100
     }
     if (_CA1 == LOW && _CA0 == FLOATING)
     {
-    ADC_address = 0010101
+    ADC_address_set = 0010101
     }
     if (_CA1 == FLOATING && _CA0 == FLOATING)
     {
-    ADC_address = 0100100
+    ADC_address_set = 0100100
     }
     if (_CA1 == HIGH && _CA0 == HIGH)
     {
-    ADC_address = 0100110
+    ADC_address_set = 0100110
     }
     if (_CA1 == HIGH && _CA0 == FLOATING)
     {
-    ADC_address = 0100111
+    ADC_address_set = 0100111
     }
-return(ADC_address)
+
+return(ADC_address_set)
 }
 
 void LTC2481::Command_synchronise_all_ADC()
 {
-    ADC_address = 1110111
+    ADC_address_set = 1110111
 }
 
 //Load the avaidable Samplerates into an array to be searched later
@@ -125,7 +84,7 @@ bool LTC2481::ADC_Samplerate_init()
     return 0;
 }
 
-int32_t LTC2481::ADC_Samplerate_select(int32_t samplerate_requested)
+int32_t LTC2481::Request_samplerate(uint32_t samplerate_requested)
 {
     uint32_t samplerate_commanded = 0;
 
@@ -144,23 +103,21 @@ int32_t LTC2481::ADC_Samplerate_select(int32_t samplerate_requested)
 
     }
 
-    ADC_set_settings(ADC_address);
+    ADC_set_settings(ADC_address_set);
 
-    ADC_reseted = true;
-
-    return samplerate_set;
+    return (samplerate_set);
 }
 
 //Select the appropriate Gain setting for maximising  ADC resolution for a voltage in mV given by the user.
-uint32_t LTC2481::ADC_Meassurement_Range(uint32_t adc_input_range_requested)
+uint32_t LTC2481::Request_Meassurement_Range(uint32_t adc_input_range_requested)
 {
     range_gain_requested = (0.5*ADC_ReferenceVoltage) / adc_input_range_requested  // Range of LTC2481 is +/- 0.5*Vref
 
-    range_gain_set = ADC_Amplification_Gain_select(range_gain_requested);
+    range_gain_set = Request_Amplification_Gain(range_gain_requested);
 
     input_range_set = (0.5 * ADC_ReferenceVoltage) / range_gain_set ;
 
-    return input_range_set;
+    return (input_range_set);
 }
 
 //Load the avaidable Gains into an arry to be searched later
@@ -183,7 +140,7 @@ bool LTC2481::ADC_Amplification_Gain_init()
 //set up the avaidable Gain settings in an Array
 //find the smaller gain fitting to stay on safe range side
 //set the Gain setting byte in the ADC
-uint8_t LTC2481::ADC_Amplification_Gain_select(uint8_t ADC_Gain_requested)
+uint8_t LTC2481::Request_Amplification_Gain(uint8_t ADC_Gain_requested)
 {
     uint32_t gain_commanded = 0;
 
@@ -225,7 +182,7 @@ uint8_t LTC2481::ADC_Amplification_Gain_select(uint8_t ADC_Gain_requested)
 
         ADC_Control(ADS_DRATE, gain_set);
 
-return gain_set
+return (gain_set);
 }
 
 //Assemble the settings byte from private variables. Then write the settings to the passed address.
@@ -237,7 +194,7 @@ void LTC2481::ADC_set_settings()
     ADC_settings = ( gain_set | temperatureread_set | rejection_set | samplerate_set )
 
     I2C.start;
-    result = I2C.write(ADC_address | 0 );
+    result = I2C.write(ADC_address_set_set | 0 );
 
     if (result == 0)
     {
@@ -265,11 +222,11 @@ int32_t LTC2481::ADC_read_data()
     int32_t analog_in = 0;
 
     I2C.start
-    result = I2C.write(ADC_address | 1 )
+    result = I2C.write(ADC_address_set_set | 1 )
 
     if (result == 0)
     {
-        I2C.read(ADC_address, data, 3);                // MSB, MidByte, LSB
+        I2C.read(ADC_address_set, data, 3);                // MSB, MidByte, LSB
         I2C.stop
     }
         
