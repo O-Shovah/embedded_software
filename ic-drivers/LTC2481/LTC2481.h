@@ -112,22 +112,9 @@ public:
 
     // ***** ADC Control *****
 
-    void Command_Select(bool selected); 
-    void Command_hard_reset();
-    void Command_reset_settings();
-
-    void Command_start_continuous_mode();
-    void Command_stop_continuous_mode();
-    void Command_single_conversion();
-
     void Command_synchronise_all_ADC();
 
-
     int32_t Read_read_ADC();
-    int32_t Read_single_read_ADC();
-
-
-
     
     
     
@@ -135,18 +122,6 @@ private:
 
     //Declare IO Pins
     I2C i2c_;
-    InterruptIn Datardy_;
-    DigitalOut Chip_Select_;
-
-
-    //Declare ADC state functions
-    void Dataready_set();
-    void Dataready_unset();
-
-    //Declare ADC state variables
-    bool volatile ADS_DRDY_interrupted;
-    bool volatile ADC_reseted;
-    bool volatile ADC_data_already_read;
 
     //Initialize Samplerate selection
     bool ADC_Samplerate_init();
@@ -160,17 +135,14 @@ private:
     int32_t ADC_Number_of_Gains_avaidable;
     find_number ADC_Find_Gain;
 
-
     //Variables
-    uint8_t samplerate_set,gain_set,rejection_set_temperatureread_set,ADC_address_set;
-    
-    
+    uint8_t samplerate_set,gain_set,rejection_set,temperatureread_set,ADC_address_set;
 
+    uint32_t input_range_set;
+    int32_t I2C_clk;
+    
     //Internal Functions
     void ADC_set_settings();
-
-    
-
 
 };
 
