@@ -83,6 +83,37 @@ void LTC2481::ADC_reset_values()
     ADC_data_already_read = true;
 }
 
+uint8_t LTC2481::Set_ADC_Address(char _CA0, char _CA1)
+{
+    
+    if (_CA1 == LOW && _CA0 == HIGH)
+    {
+    ADC_address = 0010100
+    }
+    if (_CA1 == LOW && _CA0 == FLOATING)
+    {
+    ADC_address = 0010101
+    }
+    if (_CA1 == FLOATING && _CA0 == FLOATING)
+    {
+    ADC_address = 0100100
+    }
+    if (_CA1 == HIGH && _CA0 == HIGH)
+    {
+    ADC_address = 0100110
+    }
+    if (_CA1 == HIGH && _CA0 == FLOATING)
+    {
+    ADC_address = 0100111
+    }
+return(ADC_address)
+}
+
+void LTC2481::Command_synchronise_all_ADC()
+{
+    ADC_address = 1110111
+}
+
 //Load the avaidable Samplerates into an array to be searched later
 bool LTC2481::ADC_Samplerate_init()
 {
@@ -198,12 +229,12 @@ return gain_set
 }
 
 //Assemble the settings byte from private variables. Then write the settings to the passed address.
-void LTC2481::ADC_set_settings(uint8_t ADC_address)
+void LTC2481::ADC_set_settings()
 {
     uint8_t result = 0;
     uint8_t ADC_settings = 0;
 
-    ADC_settings = ( samplerate_set | gain_set | rejection_set | temperatureread_set)
+    ADC_settings = ( gain_set | temperatureread_set | rejection_set | samplerate_set )
 
     I2C.start;
     result = I2C.write(ADC_address | 0 );
@@ -215,121 +246,36 @@ void LTC2481::ADC_set_settings(uint8_t ADC_address)
 
     I2C.stop;
 
+    return(ADC_settings);
 }
 
 //Wait for ADC not reset or timout.Then read back the setting of the specified byte
-void LTC2481::ADC_read_settings(uint8_t ADC_address)
-{
-    uint8_t i=0;
-    while((ADC_reseted == true) && (i<700)) {
-
-        wait_us(1);
-        i++;
-    }
-    if(ADC_reseted == false) {
-
-        spi_.write(ADS_RREG | ADS_register);    // 0101 0011
-        spi_.write(0x00);                       // 0 Byte
-        uint8_t setting = spi_.write(0x00);
-
-        ADC_reseted == true;
-    }
-    return(setting_set);
-}
-
-//directly issu the binary byte to be written into the Control register
-uint8_t LTC2481::ADC_direct_Control(uint8_t adc_control_register)
-{
-
-    set_settings(ADS_ADCON,adc_control_register);
-    ADC_reseted = true;
-    return 0;
-
-}
-
-//Compose the byte to be written into the Control register
-uint8_t LTC2481::ADC_Control(uint8_t gain_setting, uint8_t sensor_detect, uint8_t clockout_setting)
-{
-    uint8_t adc_control_register = (clockout_setting << 7) | (sensor_detect << 5) | (gain_setting << 3);
-
-    set_settings(ADS_ADCON,adc_control_register);
-
-    ADC_reseted = true;
-
-    return adc_control_register;
-}
-
-//set up the AS1255 to return data on every Data Read
-void LTC2481::Command_start_continuous_mode()
-{
-    uint8_t i=0;
-    while((ADC_reseted == true) && (i<700)) {
-
-        wait_us(1);
-        i++;
-    }
-    if(ADC_reseted == false) {
-        spi_.write(ADS_RDATAC);
-        wait(50 * (float)MasterClockPeriod);         // Wait LTC_2481 x ClockCycles (t6)
-
-        ADC_reseted == true;
-
-    }
-
-}
-
-//Stop the LTC2481 from returning on every Data Read  
-void LTC2481::Command_stop_continuous_mode()
-{
-    uint8_t i=0;
-    while((ADC_reseted == true) && (i<700)) {
-
-        wait_us(1);
-        i++;
-    }
-    if(ADC_reseted == false) {
-        spi_.write(ADS_SDATAC);
-        wait(50 * (float)MasterClockPeriod);        // Wait LTC_2481 x ClockCycles (t6)
-
-        ADC_reseted == true;
-
-    }
-}
-
-//set up the LTC2481 returning just data from a single conversion  
-void LTC2481::Command_single_conversion()
+void LTC2481::ADC_read_settings()
 {
 
 }
-
 
 //Wait for the ADC to be ready for Data Read or Timeout
 //Then read data by sending 3 CLK bytes
 //Compose Bytes to correct int32_t format
-int32_t LTC2481::ADS_read_data()
+int32_t LTC2481::ADC_read_data()
 {
-    ADC_data_already_read = true;
-
+    uint8_t data[2] = 0
+    uint8_t result = 0;
     int32_t analog_in = 0;
-    uint16_t i=0;
 
-    while((i<700) && ((ADS_DRDY_interrupted == false) || (ADC_data_already_read == true)) ) {
+    I2C.start
+    result = I2C.write(ADC_address | 1 )
 
-        wait_us(1);
-        i++;
+    if (result == 0)
+    {
+        I2C.read(ADC_address, data, 3);                // MSB, MidByte, LSB
+        I2C.stop
     }
+        
 
-    if((ADS_DRDY_interrupted == true) && (ADC_data_already_read == false)) {             // Wait LTC_2481 DataReady-Pin
+    analog_in = ((data[0] << 24) + (data[1] << 16) + (data[2] << 8)) / 256;   // shift all and divide by 0xFF for right sign
 
-        uint8_t data0 = spi_.write(0x00);                // MSB
-        uint8_t data1 = spi_.write(0x00);                // MidByte
-        uint8_t data2 = spi_.write(0x00);                // LSB
-
-        analog_in = ((data0 << 24) + (data1 << 16) + (data2 << 8)) / 256;   // shift all and divide by 0xFF for right sign
-
-        ADC_data_already_read = true;
-
-    }
-
+    
     return(analog_in);
 }
