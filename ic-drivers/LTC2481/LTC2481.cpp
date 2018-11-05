@@ -64,10 +64,8 @@ LTC2481::LTC2481(PinName _sda, PinName _scl) : I2C_(_sda, _scl)
     //Create Object to find the feasible Gain value
     ADC_Find_Gain = find_number (ADC_Amplification_Gains_avaidable,ADC_Number_of_Gains_avaidable);
 
-
     //set up the I2C Bus
     I2C_.frequency(I2C_clk);
-
 }
 
 /*

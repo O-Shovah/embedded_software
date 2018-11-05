@@ -121,7 +121,7 @@ public:
 private:
 
     //Declare IO Pins
-    I2C i2c_;
+    I2C I2C_;
 
     //Initialize Samplerate selection
     bool ADC_Samplerate_init();
