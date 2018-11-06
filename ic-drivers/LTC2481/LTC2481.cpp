@@ -9,7 +9,7 @@
 *   Class initialisation
 */
 
-LTC2481::LTC2481(PinName _sda, PinName _scl, char _CA0, char _CA1) : I2C_(_sda, _scl), Addressconfig_ (_CA0, _CA1)
+LTC2481::LTC2481(PinName _sda, PinName _scl, char _CA0, char _CA1) : I2C_(_sda, _scl), Addresspin1_ (_CA0), Addresspin2_ (_CA1)
 {
     //Initialize ADC setting variables
     samplerate_set = 0b00000000;
@@ -29,7 +29,7 @@ LTC2481::LTC2481(PinName _sda, PinName _scl, char _CA0, char _CA1) : I2C_(_sda, 
     //Initialize the available values for the Gain selection
     ADC_Amplification_Gain_init();
 
-	//Create Object to find the feasible Gain value
+    //Create Object to find the feasible Gain value
     ADC_Find_Gain = find_number (ADC_Amplification_Gains_avaidable,ADC_Number_of_Gains_avaidable);
 
 
@@ -37,7 +37,7 @@ LTC2481::LTC2481(PinName _sda, PinName _scl, char _CA0, char _CA1) : I2C_(_sda, 
     I2C_.frequency(I2C_clk);
 
     //set up the I2C address
-    Set_ADC_address(Addressconfig_);
+   // Set_ADC_address(Addresspin1_, Addresspin2_);
 }
 
 
@@ -72,42 +72,65 @@ LTC2481::LTC2481(PinName _sda, PinName _scl) : I2C_(_sda, _scl)
 *   Class Functions
 */
 
-uint8_t LTC2481::Set_ADC_address(char _CA0, char _CA1)
+
+
+uint8_t LTC2481::Set_ADC_Address(char _CA0, char _CA1)
 {
     
-    if (_CA1 == LOW && _CA0 == HIGH)
+    if (_CA1 == 'LOW' && _CA0 == 'HIGH')
     {
-    ADC_address_set = 0b0010100
+    ADC_address_set = 0b0010100;
     }
-    if (_CA1 == LOW && _CA0 == FLOATING)
+    if (_CA1 == 'LOW' && _CA0 == 'FLOATING')
     {
-    ADC_address_set = 0b0010101
+    ADC_address_set = 0b0010101;
     }
-    if (_CA1 == FLOATING && _CA0 == FLOATING)
+    if (_CA1 == 'FLOATING' && _CA0 == 'FLOATING')
     {
-    ADC_address_set = 0b0100100
+    ADC_address_set = 0b0100100;
     }
-    if (_CA1 == HIGH && _CA0 == HIGH)
+    if (_CA1 == 'HIGH' && _CA0 == 'HIGH')
     {
-    ADC_address_set = 0b0100110
+    ADC_address_set = 0b0100110;
     }
-    if (_CA1 == HIGH && _CA0 == FLOATING)
+    if (_CA1 == 'HIGH' && _CA0 == 'FLOATING')
     {
-    ADC_address_set = 0b0100111
+    ADC_address_set = 0b0100111;
     }
 
-    return(ADC_address_set)
+    return(ADC_address_set);
 }
 
 void LTC2481::Command_synchronise_all_ADC()
 {
-    ADC_address_set = 0b1110111
+    ADC_address_set = 0b1110111;
+}
+
+//Assemble the settings byte from private variables. Then write the settings to the passed address.
+uint8_t LTC2481::ADC_set_settings()
+{
+    uint8_t result = 0;
+    uint8_t ADC_settings = 0;
+
+    ADC_settings = ( gain_set | temperatureread_set | rejection_set | samplerate_set );
+
+    I2C_.start();
+    result = I2C_.write(ADC_address_set | 0 );
+
+    if (result == 0)
+    {
+    result = I2C_.write(ADC_settings);
+    }
+
+    I2C_.stop();
+
+    return(ADC_settings);
 }
 
 //Load the avaidable Samplerates into an array to be searched later
 bool LTC2481::ADC_Samplerate_init()
 {
-	ADC_Samplerates_avaidable[0] = 7;
+    ADC_Samplerates_avaidable[0] = 7;
     ADC_Samplerates_avaidable[1] = 15;
 
     ADC_Number_of_Samplerates_avaidable = (sizeof(ADC_Samplerates_avaidable)/sizeof(*ADC_Samplerates_avaidable));
@@ -115,7 +138,7 @@ bool LTC2481::ADC_Samplerate_init()
     return 0;
 }
 
-int32_t LTC2481::Request_samplerate(uint32_t samplerate_requested)
+uint32_t LTC2481::Request_samplerate(uint32_t samplerate_requested)
 {
     uint32_t samplerate_commanded = 0;
 
@@ -133,16 +156,14 @@ int32_t LTC2481::Request_samplerate(uint32_t samplerate_requested)
             samplerate_set = 0b00000000; // Error Message
 
     }
-
-    ADC_set_settings(ADC_address_set);
-
-    return (samplerate_set);
+    
+    return(samplerate_set);
 }
 
 //Select the appropriate Gain setting for maximising  ADC resolution for a voltage in mV given by the user.
 uint32_t LTC2481::Request_Meassurement_Range(uint32_t adc_input_range_requested)
 {
-    range_gain_requested = (0.5*ADC_ReferenceVoltage) / adc_input_range_requested  // Range of LTC2481 is +/- 0.5*Vref
+    range_gain_requested = (0.5*ADC_ReferenceVoltage) / adc_input_range_requested;  // Range of LTC2481 is +/- 0.5*Vref
 
     range_gain_set = Request_Amplification_Gain(range_gain_requested);
 
@@ -154,18 +175,18 @@ uint32_t LTC2481::Request_Meassurement_Range(uint32_t adc_input_range_requested)
 //Load the avaidable Gains into an arry to be searched later
 bool LTC2481::ADC_Amplification_Gain_init()
 {
-	ADC_Amplification_Gains_avaidable[0] = 1
-	ADC_Amplification_Gains_avaidable[1] = 4
-	ADC_Amplification_Gains_avaidable[2] = 8
-	ADC_Amplification_Gains_avaidable[3] = 16
-	ADC_Amplification_Gains_avaidable[4] = 32
-	ADC_Amplification_Gains_avaidable[5] = 64
-	ADC_Amplification_Gains_avaidable[6] = 128
-    ADC_Amplification_Gains_avaidable[7] = 256
+    ADC_Amplification_Gains_avaidable[0] = 1;
+    ADC_Amplification_Gains_avaidable[1] = 4;
+    ADC_Amplification_Gains_avaidable[2] = 8;
+    ADC_Amplification_Gains_avaidable[3] = 16;
+    ADC_Amplification_Gains_avaidable[4] = 32;
+    ADC_Amplification_Gains_avaidable[5] = 64;
+    ADC_Amplification_Gains_avaidable[6] = 128;
+    ADC_Amplification_Gains_avaidable[7] = 256;
 
-	ADC_Number_of_Gains_avaidable = (sizeof(ADC_Amplification_Gains_avaidable)/sizeof(*ADC_Amplification_Gains_avaidable));
+    ADC_Number_of_Gains_avaidable = (sizeof(ADC_Amplification_Gains_avaidable)/sizeof(*ADC_Amplification_Gains_avaidable));
 
-	return 0;
+    return 0;
 }
 
 //set up the avaidable Gain settings in an Array
@@ -175,11 +196,11 @@ uint8_t LTC2481::Request_Amplification_Gain(uint8_t ADC_Gain_requested)
 {
     uint32_t gain_commanded = 0;
 
-    gain_commanded = ADC_Find_Gain.find_smaller(Gain_requested);
+    gain_commanded = ADC_Find_Gain.find_smaller(gain_requested);
 
     if (samplerate_set == 0b00000001)
     {
-    gain_commanded = gain_commanded << 1
+    gain_commanded = gain_commanded << 1;
     }
 
     switch(gain_commanded) {
@@ -210,55 +231,34 @@ uint8_t LTC2481::Request_Amplification_Gain(uint8_t ADC_Gain_requested)
 
         default :
             gain_set = 0b00000000; // PGA 1 (default)
-
-        ADC_Control(ADS_DRATE, gain_set);
+        }
 
     return (gain_set);
 }
 
-//Assemble the settings byte from private variables. Then write the settings to the passed address.
-void LTC2481::ADC_set_settings()
+
+//Write back the setting of the specified parameter
+uint32_t LTC2481::Read_samplerate_set()
 {
-    uint8_t result = 0;
-    uint8_t ADC_settings = 0;
-
-    ADC_settings = ( gain_set | temperatureread_set | rejection_set | samplerate_set )
-
-    I2C_.start;
-    result = I2C_.write(ADC_address_set_set | 0 );
-
-    if (result == 0)
-    {
-    result = I2C_.write(ADC_settings);
-    }
-
-    I2C_.stop;
-
-    return(ADC_settings);
+return(samplerate_set);
 }
 
 //Write back the setting of the specified parameter
-void LTC2481::Read_samplerate_set()
+uint8_t LTC2481::Read_Amplification_Gain()
 {
-return(samplerate_set)
+return(gain_set);
 }
 
 //Write back the setting of the specified parameter
-void LTC2481::Read_Amplification_Gain()
+uint32_t LTC2481::Read_Meassurement_Range()
 {
-return(gain_set)
+return(input_range_set);
 }
 
 //Write back the setting of the specified parameter
-void LTC2481::Read_Meassurement_Range()
+uint8_t LTC2481::Read_ADC_Address()
 {
-return(input_range_set)
-}
-
-//Write back the setting of the specified parameter
-void LTC2481::Read_ADC_Address()
-{
-return(ADC_address_set)
+return(ADC_address_set);
 }
 
 //Wait for the ADC to be ready for Data Read or Timeout
@@ -266,17 +266,20 @@ return(ADC_address_set)
 //Compose Bytes to correct int32_t format
 int32_t LTC2481::Read_read_ADC()
 {
-    uint8_t data[2] = 0
+    data[0] = 0;
+    data[1] = 0;
+    data[2] = 0;
+    
     uint8_t result = 0;
     int32_t analog_in = 0;
 
-    I2C_.start
-    result = I2C_.write(ADC_address_set_set | 1 )
+    I2C_.start();
+    result = I2C_.write(ADC_address_set | 1 );
 
     if (result == 0)
     {
         I2C_.read(ADC_address_set, data, 3);                // MSB, MidByte, LSB
-        I2C_.stop
+        I2C_.stop();
     }
         
 

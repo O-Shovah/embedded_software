@@ -87,7 +87,7 @@ public:
     
     // ***** Bus Settings *****
 
-    uint8_t  Set_Bus_Frequency(uint32_t I2C_frequency) // Set the operation frequency for the I2C Bus communiaction
+    uint8_t  Set_Bus_Frequency(uint32_t I2C_frequency); // Set the operation frequency for the I2C Bus communiaction
 
     // ***** ADC Settings *****
 
@@ -97,7 +97,7 @@ public:
     
     uint32_t Request_Meassurement_Range(uint32_t adc_input_range_requested); // user requests an input range in mV. Returns the Meassurement Range that was actually set.
 
-    uint32_t Request_rejection_frequency(uint32_t rejection_frequency_requested) // user request a frequency to bei rejected by internal ADC filters
+    uint32_t Request_rejection_frequency(uint32_t rejection_frequency_requested); // user request a frequency to bei rejected by internal ADC filters
 
     uint8_t Set_ADC_Address(char _CA0, char _CA1); // user sets the ADC Address by handing state of the address configuration pins. Returns success.
 
@@ -123,6 +123,8 @@ private:
     //Declare IO Pins
     I2C I2C_;
 
+    char Addresspin1_,Addresspin2_;
+
     //Initialize Samplerate selection
     bool ADC_Samplerate_init();
     int32_t ADC_Samplerates_avaidable[2];
@@ -136,13 +138,15 @@ private:
     find_number ADC_Find_Gain;
 
     //Variables
-    uint8_t samplerate_set,gain_set,rejection_set,temperatureread_set,ADC_address_set;
+    uint8_t samplerate_set,gain_set,rejection_set,temperatureread_set,ADC_address_set,range_gain_requested,range_gain_set,gain_requested;
+    
+    char data[3];
 
     uint32_t input_range_set;
     int32_t I2C_clk;
     
     //Internal Functions
-    void ADC_set_settings();
+    uint8_t ADC_set_settings();
 
 };
 
