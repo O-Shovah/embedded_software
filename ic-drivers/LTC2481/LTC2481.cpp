@@ -9,7 +9,7 @@
 *   Class initialisation
 */
 
-LTC2481::LTC2481(PinName _sda, PinName _scl, char _CA0, char _CA1) : I2C_(_sda, _scl), Addresspin1_ (_CA0), Addresspin2_ (_CA1)
+LTC2481::LTC2481(PinName _sda, PinName _scl, string _CA0, string _CA1) : I2C_(_sda, _scl), Addresspin1_ (_CA0), Addresspin2_ (_CA1)
 {
     //Initialize ADC setting variables
     samplerate_set = 0b00000000;
@@ -74,26 +74,26 @@ LTC2481::LTC2481(PinName _sda, PinName _scl) : I2C_(_sda, _scl)
 
 
 
-uint8_t LTC2481::Set_ADC_Address(char _CA0, char _CA1)
+uint8_t LTC2481::Set_ADC_Address(string _CA0, string _CA1)
 {
     
-    if (_CA1 == 'LOW' && _CA0 == 'HIGH')
+    if (_CA1 == "LOW" && _CA0 == "HIGH")
     {
     ADC_address_set = 0b0010100;
     }
-    if (_CA1 == 'LOW' && _CA0 == 'FLOATING')
+    if (_CA1 == "LOW" && _CA0 == "FLOATING")
     {
     ADC_address_set = 0b0010101;
     }
-    if (_CA1 == 'FLOATING' && _CA0 == 'FLOATING')
+    if (_CA1 == "FLOATING" && _CA0 == "FLOATING")
     {
     ADC_address_set = 0b0100100;
     }
-    if (_CA1 == 'HIGH' && _CA0 == 'HIGH')
+    if (_CA1 == "HIGH" && _CA0 == "HIGH")
     {
     ADC_address_set = 0b0100110;
     }
-    if (_CA1 == 'HIGH' && _CA0 == 'FLOATING')
+    if (_CA1 == "HIGH" && _CA0 == "FLOATING")
     {
     ADC_address_set = 0b0100111;
     }
