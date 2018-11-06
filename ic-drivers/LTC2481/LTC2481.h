@@ -7,6 +7,9 @@
 
 #include "find_number.h"
 
+#include <string> 
+using namespace std;
+
 /**
  *  Defines
  */
@@ -79,7 +82,7 @@ public:
      *  Constructor.
      */
 
-    LTC2481(PinName _sda, PinName _scl, char _CA0, char _CA1); //Object creation with handed I2C Bus pins and state of the two address configuration Pins
+    LTC2481(PinName _sda, PinName _scl, string _CA0, string _CA1); //Object creation with handed I2C Bus pins and state of the two address configuration Pins
 
 
     LTC2481(PinName _sda, PinName _scl); //Object creation with handed I2C Bus pins and default address
@@ -99,7 +102,7 @@ public:
 
     uint32_t Request_rejection_frequency(uint32_t rejection_frequency_requested); // user request a frequency to bei rejected by internal ADC filters
 
-    uint8_t Set_ADC_Address(char _CA0, char _CA1); // user sets the ADC Address by handing state of the address configuration pins. Returns success.
+    uint8_t Set_ADC_Address(string _CA0, string _CA1); // user sets the ADC Address by handing state of the address configuration pins. Returns success.
 
 
     uint32_t Read_samplerate_set(); // returns the samplerate currently configured in the ADC
@@ -123,7 +126,7 @@ private:
     //Declare IO Pins
     I2C I2C_;
 
-    char Addresspin1_,Addresspin2_;
+    string Addresspin1_,Addresspin2_;
 
     //Initialize Samplerate selection
     bool ADC_Samplerate_init();
