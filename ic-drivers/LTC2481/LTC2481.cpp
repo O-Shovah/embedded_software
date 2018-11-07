@@ -37,7 +37,7 @@ LTC2481::LTC2481(PinName _sda, PinName _scl, string _CA0, string _CA1) : I2C_(_s
     I2C_.frequency(I2C_clk);
 
     //set up the I2C address
-   // Set_ADC_address(Addresspin1_, Addresspin2_);
+    Set_ADC_Address(Addresspin1_, Addresspin2_);
 }
 
 
@@ -147,7 +147,7 @@ uint32_t LTC2481::Request_samplerate(uint32_t samplerate_requested)
     switch(samplerate_commanded) {
 
         case 7 :
-            samplerate_set = 0b00000000; //2.5SPS
+            samplerate_set = 0b00000000; //7.5SPS
 
         case 15 :
             samplerate_set = 0b00000001; //5SPS

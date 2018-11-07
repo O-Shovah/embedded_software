@@ -126,8 +126,6 @@ private:
     //Declare IO Pins
     I2C I2C_;
 
-    string Addresspin1_,Addresspin2_;
-
     //Initialize Samplerate selection
     bool ADC_Samplerate_init();
     int32_t ADC_Samplerates_avaidable[2];
@@ -141,12 +139,22 @@ private:
     find_number ADC_Find_Gain;
 
     //Variables
-    uint8_t samplerate_set,gain_set,rejection_set,temperatureread_set,ADC_address_set,range_gain_requested,range_gain_set,gain_requested;
+    uint8_t samplerate_set,
+    gain_set,
+    rejection_set,
+    temperatureread_set,
+    ADC_address_set,
+    range_gain_requested,
+    range_gain_set,
+    gain_requested;
+    
+    uint32_t input_range_set;
+    
+    int32_t I2C_clk;
     
     char data[3];
-
-    uint32_t input_range_set;
-    int32_t I2C_clk;
+    
+    string Addresspin1_,Addresspin2_;
     
     //Internal Functions
     uint8_t ADC_set_settings();
