@@ -32,7 +32,6 @@ LTC2481::LTC2481(PinName _sda, PinName _scl, string _CA0, string _CA1) : I2C_(_s
     //Create Object to find the feasible Gain value
     ADC_Find_Gain = find_number (ADC_Amplification_Gains_avaidable,ADC_Number_of_Gains_avaidable);
 
-
     //set up the I2C Bus
     I2C_.frequency(I2C_clk);
 
@@ -150,7 +149,7 @@ uint32_t LTC2481::Request_samplerate(uint32_t samplerate_requested)
             samplerate_set = 0b00000000; //7.5SPS
 
         case 15 :
-            samplerate_set = 0b00000001; //5SPS
+            samplerate_set = 0b00000001; //15SPS
 
         default :
             samplerate_set = 0b00000000; // Error Message
@@ -281,10 +280,8 @@ int32_t LTC2481::Read_read_ADC()
         I2C_.read(ADC_address_set, data, 3);                // MSB, MidByte, LSB
         I2C_.stop();
     }
-        
 
     analog_in = ((data[0] << 24) + (data[1] << 16) + (data[2] << 8)) / 256;   // shift all and divide by 0xFF for right sign
 
-    
     return(analog_in);
 }
