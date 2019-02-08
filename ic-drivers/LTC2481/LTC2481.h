@@ -119,6 +119,8 @@ public:
 
     int32_t Read_read_ADC();
     
+    uint8_t ADC_set_settings();
+    
     
     
 private:
@@ -157,7 +159,7 @@ private:
     string Addresspin1_,Addresspin2_;
     
     //Internal Functions
-    uint8_t ADC_set_settings();
+    //uint8_t ADC_set_settings();
 
 };
 

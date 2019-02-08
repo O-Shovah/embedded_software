@@ -32,6 +32,7 @@ LTC2481::LTC2481(PinName _sda, PinName _scl, string _CA0, string _CA1) : I2C_(_s
     //Create Object to find the feasible Gain value
     ADC_Find_Gain = find_number (ADC_Amplification_Gains_avaidable,ADC_Number_of_Gains_avaidable);
 
+
     //set up the I2C Bus
     I2C_.frequency(I2C_clk);
 
@@ -78,31 +79,35 @@ uint8_t LTC2481::Set_ADC_Address(string _CA0, string _CA1)
     
     if (_CA1 == "LOW" && _CA0 == "HIGH")
     {
-    ADC_address_set = 0b0010100;
+    ADC_address_set = 0b00101000;
     }
     if (_CA1 == "LOW" && _CA0 == "FLOATING")
     {
-    ADC_address_set = 0b0010101;
+    ADC_address_set = 0b00101010;
     }
-    if (_CA1 == "FLOATING" && _CA0 == "FLOATING")
+    if (_CA1 == "FLOATING" && _CA0 == "HIGH")
     {
-    ADC_address_set = 0b0100100;
+    ADC_address_set = 0b01001110;
+    }
+        if (_CA1 == "FLOATING" && _CA0 == "FLOATING")
+    {
+    ADC_address_set = 0b01001000;
     }
     if (_CA1 == "HIGH" && _CA0 == "HIGH")
     {
-    ADC_address_set = 0b0100110;
+    ADC_address_set = 0b01001100;
     }
     if (_CA1 == "HIGH" && _CA0 == "FLOATING")
     {
-    ADC_address_set = 0b0100111;
+    ADC_address_set = 0b01001110;
     }
 
     return(ADC_address_set);
-}
+    }
 
 void LTC2481::Command_synchronise_all_ADC()
 {
-    ADC_address_set = 0b1110111;
+    ADC_address_set = 0b11101110;
 }
 
 //Assemble the settings byte from private variables. Then write the settings to the passed address.
@@ -114,12 +119,16 @@ uint8_t LTC2481::ADC_set_settings()
     ADC_settings = ( gain_set | temperatureread_set | rejection_set | samplerate_set );
 
     I2C_.start();
-    result = I2C_.write(ADC_address_set | 0 );
+    result = I2C_.write(ADC_address_set | 0b00000000 );
+    //result = I2C_.write(0b00101000);
+    //wait_us(20);
+    
+    //I2C_.write(0b0100100);
 
-    if (result == 0)
-    {
+   if (result == 0)
+   {
     result = I2C_.write(ADC_settings);
-    }
+   }
 
     I2C_.stop();
 
@@ -147,16 +156,20 @@ uint32_t LTC2481::Request_samplerate(uint32_t samplerate_requested)
 
         case 7 :
             samplerate_set = 0b00000000; //7.5SPS
-
+            break;
+            
         case 15 :
             samplerate_set = 0b00000001; //15SPS
+            break;
 
         default :
             samplerate_set = 0b00000000; // Error Message
+            break;
 
     }
     
     return(samplerate_set);
+    //return(samplerate_commanded);
 }
 
 //Select the appropriate Gain setting for maximising  ADC resolution for a voltage in mV given by the user.
@@ -273,15 +286,17 @@ int32_t LTC2481::Read_read_ADC()
     int32_t analog_in = 0;
 
     I2C_.start();
-    result = I2C_.write(ADC_address_set | 1 );
+    result = I2C_.write(ADC_address_set | 0b00000001 );
 
     if (result == 0)
     {
         I2C_.read(ADC_address_set, data, 3);                // MSB, MidByte, LSB
         I2C_.stop();
     }
+        
 
     analog_in = ((data[0] << 24) + (data[1] << 16) + (data[2] << 8)) / 256;   // shift all and divide by 0xFF for right sign
 
+    
     return(analog_in);
 }
