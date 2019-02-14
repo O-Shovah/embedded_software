@@ -76,34 +76,28 @@ LTC2481::LTC2481(PinName _sda, PinName _scl) : I2C_(_sda, _scl)
 
 uint8_t LTC2481::Set_ADC_Address(string _CA0, string _CA1)
 {
-    
-    if (_CA1 == "LOW" && _CA0 == "HIGH")
-    {
-    ADC_address_set = 0b00101000;
+
+    if (_CA1 == "LOW" && _CA0 == "HIGH") {
+        ADC_address_set = 0b00101000;
     }
-    if (_CA1 == "LOW" && _CA0 == "FLOATING")
-    {
-    ADC_address_set = 0b00101010;
+    if (_CA1 == "LOW" && _CA0 == "FLOATING") {
+        ADC_address_set = 0b00101010;
     }
-    if (_CA1 == "FLOATING" && _CA0 == "HIGH")
-    {
-    ADC_address_set = 0b01001110;
+    if (_CA1 == "FLOATING" && _CA0 == "HIGH") {
+        ADC_address_set = 0b01001110;
     }
-        if (_CA1 == "FLOATING" && _CA0 == "FLOATING")
-    {
-    ADC_address_set = 0b01001000;
+    if (_CA1 == "FLOATING" && _CA0 == "FLOATING") {
+        ADC_address_set = 0b01001000;
     }
-    if (_CA1 == "HIGH" && _CA0 == "HIGH")
-    {
-    ADC_address_set = 0b01001100;
+    if (_CA1 == "HIGH" && _CA0 == "HIGH") {
+        ADC_address_set = 0b01001100;
     }
-    if (_CA1 == "HIGH" && _CA0 == "FLOATING")
-    {
-    ADC_address_set = 0b01001110;
+    if (_CA1 == "HIGH" && _CA0 == "FLOATING") {
+        ADC_address_set = 0b01001110;
     }
 
     return(ADC_address_set);
-    }
+}
 
 void LTC2481::Command_synchronise_all_ADC()
 {
@@ -120,19 +114,14 @@ uint8_t LTC2481::ADC_set_settings()
 
     I2C_.start();
     result = I2C_.write(ADC_address_set | 0b00000000 );
-    //result = I2C_.write(0b00101000);
-    //wait_us(20);
-    
-    //I2C_.write(0b0100100);
 
-   if (result == 0)
-   {
-    result = I2C_.write(ADC_settings);
-   }
+    if (result == 0b00000001) {
+        result = I2C_.write(ADC_settings);
+    }
 
     I2C_.stop();
 
-    return(ADC_settings);
+    return(result);
 }
 
 //Load the avaidable Samplerates into an array to be searched later
@@ -157,7 +146,7 @@ uint32_t LTC2481::Request_samplerate(uint32_t samplerate_requested)
         case 7 :
             samplerate_set = 0b00000000; //7.5SPS
             break;
-            
+
         case 15 :
             samplerate_set = 0b00000001; //15SPS
             break;
@@ -167,9 +156,8 @@ uint32_t LTC2481::Request_samplerate(uint32_t samplerate_requested)
             break;
 
     }
-    
+
     return(samplerate_set);
-    //return(samplerate_commanded);
 }
 
 //Select the appropriate Gain setting for maximising  ADC resolution for a voltage in mV given by the user.
@@ -210,9 +198,8 @@ uint8_t LTC2481::Request_Amplification_Gain(uint8_t ADC_Gain_requested)
 
     gain_commanded = ADC_Find_Gain.find_smaller(gain_requested);
 
-    if (samplerate_set == 0b00000001)
-    {
-    gain_commanded = gain_commanded << 1;
+    if (samplerate_set == 0b00000001) {
+        gain_commanded = gain_commanded << 1;
     }
 
     switch(gain_commanded) {
@@ -243,7 +230,7 @@ uint8_t LTC2481::Request_Amplification_Gain(uint8_t ADC_Gain_requested)
 
         default :
             gain_set = 0b00000000; // PGA 1 (default)
-        }
+    }
 
     return (gain_set);
 }
@@ -252,25 +239,25 @@ uint8_t LTC2481::Request_Amplification_Gain(uint8_t ADC_Gain_requested)
 //Write back the setting of the specified parameter
 uint32_t LTC2481::Read_samplerate_set()
 {
-return(samplerate_set);
+    return(samplerate_set);
 }
 
 //Write back the setting of the specified parameter
 uint8_t LTC2481::Read_Amplification_Gain()
 {
-return(gain_set);
+    return(gain_set);
 }
 
 //Write back the setting of the specified parameter
 uint32_t LTC2481::Read_Meassurement_Range()
 {
-return(input_range_set);
+    return(input_range_set);
 }
 
 //Write back the setting of the specified parameter
 uint8_t LTC2481::Read_ADC_Address()
 {
-return(ADC_address_set);
+    return(ADC_address_set);
 }
 
 //Wait for the ADC to be ready for Data Read or Timeout
@@ -278,25 +265,50 @@ return(ADC_address_set);
 //Compose Bytes to correct int32_t format
 int32_t LTC2481::Read_read_ADC()
 {
-    data[0] = 0;
-    data[1] = 0;
-    data[2] = 0;
-    
+
     uint8_t result = 0;
+
     int32_t analog_in = 0;
+    uint32_t analog_in_long = 0;
+    uint16_t analog_in_unsigned;
+
+    uint8_t sign = 0;
+
+    uint8_t data0;
+    uint8_t data1;
+    uint8_t data2;
+
 
     I2C_.start();
     result = I2C_.write(ADC_address_set | 0b00000001 );
 
-    if (result == 0)
-    {
-        I2C_.read(ADC_address_set, data, 3);                // MSB, MidByte, LSB
+    if (result == 0b00000001) {
+        data0 = I2C_.read(result);      // MSB
+        data1 = I2C_.read(result);      // MidByte
+        data2 = I2C_.read(result);      // LSB
         I2C_.stop();
     }
-        
 
-    analog_in = ((data[0] << 24) + (data[1] << 16) + (data[2] << 8)) / 256;   // shift all and divide by 0xFF for right sign
+    sign = data0 & 0b10000000;
 
-    
-    return(analog_in);
+    //data2 = data2 & 0b11000000;
+
+    analog_in_unsigned = ((data0 << 10) + (data1 << 2) + (data2 >> 6));
+
+    analog_in_long = analog_in_unsigned;
+
+    switch(sign) {
+
+        case 0 : {
+            analog_in = (analog_in + analog_in_unsigned);
+        }
+
+        case 1 : {
+            analog_in = (analog_in - analog_in_unsigned);
+
+        }
+
+    }
+
+    return(analog_in_long);
 }
