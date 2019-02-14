@@ -267,12 +267,12 @@ int32_t LTC2481::Read_read_ADC()
 {
 
     uint8_t result = 0;
+    uint8_t param = 0;
+    uint8_t sign = 0;
 
     int32_t analog_in = 0;
     uint32_t analog_in_long = 0;
     uint16_t analog_in_unsigned;
-
-    uint8_t sign = 0;
 
     uint8_t data0;
     uint8_t data1;
@@ -291,21 +291,25 @@ int32_t LTC2481::Read_read_ADC()
 
     sign = data0 & 0b10000000;
 
-    //data2 = data2 & 0b11000000;
+    param = data2 & 0b00111111;
 
     analog_in_unsigned = ((data0 << 10) + (data1 << 2) + (data2 >> 6));
 
     analog_in_long = analog_in_unsigned;
 
+
     switch(sign) {
 
         case 0 : {
-            analog_in = (analog_in + analog_in_unsigned);
+
+            analog_in = (analog_in_long);
         }
 
         case 1 : {
-            analog_in = (analog_in - analog_in_unsigned);
 
+            analog_in_long = (analog_in_long - 65535);
+
+            analog_in = (analog_in - analog_in_long);
         }
 
     }
